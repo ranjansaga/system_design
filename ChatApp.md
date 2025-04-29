@@ -59,3 +59,6 @@
 | Observability      | Client-side error tracking via tools like Sentry or LogRocket.               |
 | Maintainability    | Modular components, TypeScript, proper folder structure.                     |
 | Dev Experience     | Hot reload, ESLint, Prettier, Tailwind CSS for styling consistency.          |
+
+![Alt Text](https://github.com/ranjansaga/system_design/blob/main/sequence_diagram.PNG)
+
