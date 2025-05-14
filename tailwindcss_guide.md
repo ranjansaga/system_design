@@ -226,3 +226,107 @@ module.exports = {
 
 ---
 
+# 📦 Tailwind CSS Build and Minification in Next.js
+
+This document explains how Tailwind CSS is processed, purged, and minified during a production build in a Next.js application.
+
+---
+
+## ✅ CSS Build Flow in Next.js
+
+When using Tailwind CSS with Next.js (e.g., via `create-next-app` + Tailwind setup), the following steps occur:
+
+### 🧪 Development Mode (`next dev`)
+- Tailwind generates **all possible utility classes**.
+- **No purging** is done.
+- CSS is **not minified** to support fast rebuilds and HMR.
+
+---
+
+### 🚀 Production Build (`next build`)
+
+1. **PostCSS is Triggered**
+   - `tailwindcss` plugin generates styles.
+   - `autoprefixer` adds vendor prefixes.
+   - Other optional PostCSS plugins can run too.
+
+2. **Tailwind Scans Your Files (Purging)**
+   Tailwind checks files under the `content` paths defined in `tailwind.config.js`:
+
+   ```js
+   content: [
+     './app/**/*.{js,ts,jsx,tsx}',
+     './pages/**/*.{js,ts,jsx,tsx}',
+     './components/**/*.{js,ts,jsx,tsx}',
+   ]
+   ```
+
+   This removes unused utility classes from the final CSS.
+
+3. **Only Used Utility Classes Are Generated**
+   Tailwind includes only those classes used in your templates.
+
+4. **CSS Is Minified**
+   Webpack (used by Next.js) invokes `css-minimizer-webpack-plugin` to minify the CSS.
+
+5. **Final Output**
+   A small, optimized CSS file is emitted and linked into your app.
+
+---
+
+## 🛠 What Is PostCSS Doing?
+
+**PostCSS** is a tool that transforms CSS using JavaScript plugins. In Next.js, PostCSS typically runs:
+- `tailwindcss` → Generates utilities
+- `autoprefixer` → Adds vendor prefixes
+
+Unless extended, PostCSS is configured internally by Next.js, so no `postcss.config.js` is required by default.
+
+---
+
+## 🧹 Who Minifies the CSS?
+
+- **Tailwind** does not minify directly.
+- **Webpack**, under the hood of **Next.js**, handles it during production build via:
+  - `css-minimizer-webpack-plugin` for CSS
+  - `TerserPlugin` for JS
+
+Even though this isn't explicitly shown in `next.config.js`, it's included internally.
+
+You can inspect it like this:
+
+```js
+// next.config.js
+module.exports = {
+  webpack(config, { dev, isServer }) {
+    if (!dev && !isServer) {
+      console.log(config.optimization.minimizer);
+    }
+    return config;
+  },
+};
+```
+
+---
+
+## 🔌 Optional: Disabling Tailwind Core Plugins
+
+You can disable unused core plugins in `tailwind.config.js`:
+
+```js
+corePlugins: {
+  preflight: false,     // Disables Tailwind’s base styles
+  float: false,         // Disables float utilities
+  textAlign: false      // Disables text alignment utilities
+}
+```
+
+### 💡 Why disable core plugins?
+- Reduces the size of generated CSS slightly before purge.
+- Avoids loading base styles (`preflight`) if you’re using your own CSS reset.
+- Mostly helpful in **design systems** or highly customized setups.
+
+⚠️ **Note**: Disabling core plugins alone won’t drastically reduce bundle size. The biggest impact comes from **purging unused classes** via the `content` config.
+
+---
+
