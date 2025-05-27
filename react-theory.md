@@ -117,9 +117,9 @@ function Parent() {
 
 ---
 
-## ✅ When to Use `useCallback`
+# `useCallback`
 
-### Use it when:
+## Use it when:
 
 * You pass a function as a prop to a **memoized child component** (via `React.memo`).
 * You want to **avoid re-creating a function on every render** when dependencies are stable.
@@ -155,7 +155,7 @@ const handleClick = useCallback(() => {
 
 ---
 
-## useMemo
+# useMemo
 ````md
 ## 🧠 `useMemo` – What, When, and When Not to Use
 
@@ -170,7 +170,7 @@ const memoizedValue = useMemo(() => computeExpensiveValue(a, b), [a, b]);
 
 ---
 
-### ✅ When to Use `useMemo`
+## ✅ When to Use `useMemo`
 
 | Scenario                      | Description                                       |
 | ----------------------------- | ------------------------------------------------- |
@@ -198,7 +198,7 @@ const styles = useMemo(() => ({
 
 ---
 
-### ❌ When *Not* to Use `useMemo`
+## ❌ When *Not* to Use `useMemo`
 
 | Avoid if...                        | Why                                 |
 | ---------------------------------- | ----------------------------------- |
@@ -219,12 +219,10 @@ const double = useMemo(() => count * 2, [count]);
 
 > Use `useMemo` when the **computation is expensive**, or when the **result is reused or passed to a memoized child**.
 
-```
-
 ---
-## 🔍 Memoization Internals
+# 🔍 Memoization Internals
 
-### 1. `useMemo`
+## 1. `useMemo`
 
 * **Purpose**: Memoizes a computed value.
 * **Stored in**: Fiber node's `memoizedState`.
@@ -238,7 +236,7 @@ const double = useMemo(() => count * 2, [count]);
   ```
 * **Behavior**: If dependencies are the same, the cached value is reused.
 
-### 2. `useCallback`
+## 2. `useCallback`
 
 * **Purpose**: Memoizes a function reference.
 * **Stored in**: Fiber node's `memoizedState`.
@@ -252,7 +250,7 @@ const double = useMemo(() => count * 2, [count]);
   ```
 * **Behavior**: If dependencies haven't changed, the same function reference is returned.
 
-### 3. `React.memo`
+## 3. `React.memo`
 
 * **Purpose**: Prevents re-renders of a component if its props haven't changed.
 * **Stored in**: Fiber node's `memoizedProps` and `pendingProps`.
