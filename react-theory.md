@@ -1,4 +1,7 @@
 
+
+
+
 # 📌 React.memo — Summary
 
 ## ✅ What is `React.memo`?
