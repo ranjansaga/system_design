@@ -114,3 +114,97 @@ function Parent() {
 
 ### 👉 Without `React.memo`: `Child` re-renders on every button click  
 ### ✅ With `React.memo`: `Child` skips re-render if `value` doesn't change
+
+---
+
+## ✅ When to Use `useCallback`
+
+### Use it when:
+
+* You pass a function as a prop to a **memoized child component** (via `React.memo`).
+* You want to **avoid re-creating a function on every render** when dependencies are stable.
+
+### Example (Good Case):
+
+```js
+const handleClick = useCallback(() => {
+  console.log(count * 2);
+}, [count]);
+
+<Child onClick={handleClick} />
+```
+
+---
+
+## ❌ When NOT to Use `useCallback`
+
+### Avoid it when:
+
+* The dependencies include **functions declared inside the component** (which are recreated every render).
+* The function is **not passed down as a prop** or **used in performance-critical logic**.
+
+### Example (Bad Case):
+
+```js
+const getValue = () => count * 2; // recreated every render
+
+const handleClick = useCallback(() => {
+  console.log(getValue());
+}, [getValue]); // new ref every time → defeats useCallback
+```
+
+---
+
+
+## 🔍 Memoization Internals
+
+### 1. `useMemo`
+
+* **Purpose**: Memoizes a computed value.
+* **Stored in**: Fiber node's `memoizedState`.
+* **Internal Flow**:
+
+  ```js
+  {
+    memoizedValue: <cached value>,
+    deps: [/* dependency array */]
+  }
+  ```
+* **Behavior**: If dependencies are the same, the cached value is reused.
+
+### 2. `useCallback`
+
+* **Purpose**: Memoizes a function reference.
+* **Stored in**: Fiber node's `memoizedState`.
+* **Internal Flow**:
+
+  ```js
+  {
+    memoizedValue: () => { /* cached function */ },
+    deps: [/* dependency array */]
+  }
+  ```
+* **Behavior**: If dependencies haven't changed, the same function reference is returned.
+
+### 3. `React.memo`
+
+* **Purpose**: Prevents re-renders of a component if its props haven't changed.
+* **Stored in**: Fiber node's `memoizedProps` and `pendingProps`.
+* **Behavior**:
+
+  * Compares previous and new props using `Object.is` or a custom comparison.
+  * Skips render if props are the same.
+
+
+
+## 🧠 Summary Table
+
+| Hook/Feature  | Purpose                      | Stored In             | Skip Re-render? | Use Case                               |
+| ------------- | ---------------------------- | --------------------- | --------------- | -------------------------------------- |
+| `useMemo`     | Cache computed value         | `Fiber.memoizedState` | ❌ (value reuse) | Expensive calculations                 |
+| `useCallback` | Cache function ref           | `Fiber.memoizedState` | ❌ (ref reuse)   | Stable callbacks for memoized children |
+| `React.memo`  | Skip re-render on same props | `Fiber.memoizedProps` | ✅               | Prevent child component updates        |
+
+---
+
+
