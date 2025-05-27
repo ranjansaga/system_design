@@ -155,7 +155,73 @@ const handleClick = useCallback(() => {
 
 ---
 
+## useMemo
+````md
+## 🧠 `useMemo` – What, When, and When Not to Use
 
+### ✅ What is `useMemo`?
+
+- `useMemo` is a React Hook that **memoizes a computed value**, recomputing it **only when dependencies change**.
+- Useful for **avoiding unnecessary recalculations** during re-renders.
+
+```js
+const memoizedValue = useMemo(() => computeExpensiveValue(a, b), [a, b]);
+````
+
+---
+
+### ✅ When to Use `useMemo`
+
+| Scenario                      | Description                                       |
+| ----------------------------- | ------------------------------------------------- |
+| Expensive Computations        | Heavy calculations (e.g., filtering large lists)  |
+| Memoizing Derived State       | Deriving new state from props/state that’s reused |
+| Stable Props for `React.memo` | Pass a stable reference to a memoized child       |
+
+**Example – Filtering Large List**
+
+```js
+const filteredList = useMemo(() => {
+  return bigList.filter(item => item.active);
+}, [bigList]);
+```
+
+**Example – Stable Object Prop**
+
+```js
+const styles = useMemo(() => ({
+  color: theme === 'dark' ? 'white' : 'black'
+}), [theme]);
+
+<MemoizedChild style={styles} />
+```
+
+---
+
+### ❌ When *Not* to Use `useMemo`
+
+| Avoid if...                        | Why                                 |
+| ---------------------------------- | ----------------------------------- |
+| Computation is simple/cheap        | Adds unnecessary overhead           |
+| Value is not reused across renders | You gain no performance             |
+| Used blindly                       | May bloat memory and reduce clarity |
+
+**Example – Unnecessary Memoization**
+
+```js
+const double = useMemo(() => count * 2, [count]);
+// Not worth memoizing if used only once and is cheap
+```
+
+---
+
+### 🧠 Rule of Thumb
+
+> Use `useMemo` when the **computation is expensive**, or when the **result is reused or passed to a memoized child**.
+
+```
+
+---
 ## 🔍 Memoization Internals
 
 ### 1. `useMemo`
